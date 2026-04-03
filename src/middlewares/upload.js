@@ -1,7 +1,7 @@
 const multer = require('multer');
 const storage = multer.memoryStorage();
 
-// Configuracion del archivo que se va a subir a cloudinary
+// Configuracion del archivo que se va a subir a R2
 const upload = multer({
     storage,
     limits: {

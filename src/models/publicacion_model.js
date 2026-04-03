@@ -3,15 +3,27 @@ const conexion = require('../config/databse');
 
 // Crear una publicacion
 const crear_publicacion = async (datos) => {
-    const {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, dificultad, id_usuario} = datos;
+    const {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario} = datos;
 
-    await conexion.execute('INSERT INTO publicacion (titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, dificultad, id_usuario) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [titulo, descripcion, ingredientes, preparacion,  archivo, public_id, tiempo_preparacion, dificultad, id_usuario]);
+    await conexion.execute('INSERT INTO publicacion (titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [titulo, descripcion, ingredientes, preparacion,  archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario]);
 }
 
 
 // Listar todas las publicaciones
 const listar_todas_publicaciones = async () => {
-    const [resultados] = await conexion.execute('SELECT * FROM publicacion');
+    const [resultados] = await conexion.execute(`
+        SELECT
+            p.*,
+            COUNT(DISTINCT c.id_comentario) AS total_comentarios,
+            COUNT(DISTINCT r.id_usuario) AS total_reacciones
+        FROM publicacion p
+        LEFT JOIN comentario c 
+            ON c.id_publicacion = p.id_publicacion
+        LEFT JOIN reaccion r 
+            ON r.id_publicacion = p.id_publicacion
+        GROUP BY p.id_publicacion
+        ORDER BY p.fecha_creacion DESC    
+    `);
 
     return resultados;
 }
@@ -30,6 +42,7 @@ const listar_publicacion_id = async (id_publicacion) => {
         p.archivo               AS publicacion_archivo,
         p.public_id             AS publicacion_public_id,
         p.tiempo_preparacion    AS publicacion_tiempo_preparacion,
+        p.tipo_tiempo           AS publicacion_tipo_tiempo,
         p.dificultad            AS publicacion_dificultad,
         p.fecha_creacion        AS publicacion_fecha,
         p.id_usuario            AS publicacion_autor_id,
@@ -41,7 +54,7 @@ const listar_publicacion_id = async (id_publicacion) => {
         -- Autor de la publicación
         INNER JOIN usuario u_post
         ON p.id_usuario = u_post.id_usuario
-        WHERE p.id_publicacion = ?;
+        WHERE p.id_publicacion = ?
     `, [id_publicacion]);
 
     const [total_reacciones] = await conexion.execute(`SELECT COUNT(*) as total_reacciones FROM reaccion WHERE id_publicacion = ?`, [id_publicacion])
@@ -78,7 +91,8 @@ const listar_publicacion_id = async (id_publicacion) => {
         -- Autor de cada comentario
         LEFT JOIN usuario u_coment
         ON c.id_usuario = u_coment.id_usuario
-        WHERE p.id_publicacion = ?;
+        WHERE p.id_publicacion = ?
+        GROUP BY c.fecha_creacion DESC
     `, [id_publicacion]);
 
     const resultado = {
@@ -95,9 +109,9 @@ const listar_publicacion_id = async (id_publicacion) => {
 
 // Actualizar publicacion
 const actualizar_publicacion = async (datos) => {
-    const {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, dificultad, id_publicacion} = datos;
+    const {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_publicacion} = datos;
 
-    await conexion.execute('UPDATE publicacion SET titulo = ?, descripcion = ?, ingredientes = ?, preparacion = ?, archivo = ?, public_id = ?, tiempo_preparacion = ?, dificultad = ? WHERE id_publicacion = ?', [titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, dificultad, id_publicacion]); 
+    await conexion.execute('UPDATE publicacion SET titulo = ?, descripcion = ?, ingredientes = ?, preparacion = ?, archivo = ?, public_id = ?, tiempo_preparacion = ?, tipo_tiempo = ?, dificultad = ? WHERE id_publicacion = ?', [titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_publicacion]); 
 }
 
 

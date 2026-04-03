@@ -14,6 +14,9 @@ const {crear_plato_guardado,
     eliminar_plato_guardado,
     listar_platos_guardados} = require('../models/guardados_model');
 
+const {insertar_ingredientes,
+    eliminar_todos_ingredientes} = require('../models/lista_ingredientes_model');
+
 
 // ================== Funciones del controlador ==================
 
@@ -27,6 +30,9 @@ const guardar_plato = async (req, res) => {
 
         if(buscar.existe.length > 0){
             await eliminar_plato_guardado({id_usuario, id_publicacion});
+
+            // Eliminar lista de ingredientes
+            await eliminar_todos_ingredientes({id_publicacion, id_usuario});
             
             return respuesta_exito(res, "Plato Guardado eliminado correctamente", 200);
         }
@@ -41,6 +47,11 @@ const guardar_plato = async (req, res) => {
             id_publicacion_reaccionada: resultado.info_plato_guardado.id_publicacion_reaccionada,
             usuario_emisor: id_usuario
         }
+
+        // Insertar ingredientes en una lista personalizable
+        const ingredientes = JSON.parse(resultado.info_plato_guardado.ingredientes_publicacion);
+
+        await insertar_ingredientes({id_usuario, id_publicacion, ingredientes});
 
         // Llamar al servicio de noticiacion
         await notificar({

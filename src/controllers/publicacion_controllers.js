@@ -1,5 +1,6 @@
-const cloudinary = require('../config/config_cloudinary');
-const streamifier = require('streamifier');
+const { PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { v4: uuidv4 } = require('uuid');
+const r2 = require('../config/config_cloudflare');
 
 // ================== Importacion de funciones de error o exito ================== 
 const {respuesta_exito,
@@ -20,8 +21,11 @@ const {crear_publicacion,
 // Subir una publicacion
 const subir_publicacion = async (req, res) => {
     try{
-        const {titulo, descripcion, ingredientes, preparacion, tiempo_preparacion, dificultad} = req.body;
+        const {titulo, descripcion, ingredientes, preparacion, tiempo_preparacion, tipo_tiempo, dificultad} = req.body;
         const id_usuario = req.usuario.id_usuario;
+
+        // Convertir el array de ingredientes en JSON
+        const ingredientes_string = JSON.stringify(ingredientes);
 
         // Por si el usuario no sube ningun archivo, estos campos se guardan como nulos en la bbdd
         let archivo = null;
@@ -29,34 +33,26 @@ const subir_publicacion = async (req, res) => {
 
         if (req.file) {
 
-            // Funcion para cargar una el arhivo a cloudinary, transformarlo si es necesario y generar la url y el public id 
-            const resultado = await new Promise((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream(
-                    {
-                        folder: 'archivos',
-                        resource_type: 'auto',
-                        transformation: [
-                            { width: 1080, crop: "limit" },
-                            { quality: "auto" }
-                        ]
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                );
+            // --- subir imagenes a cloudflare ---
 
-                streamifier.createReadStream(req.file.buffer).pipe(stream);
-            });
+            // Generar un nombre unico para el archivo
+            const key = `archivos/${uuidv4()}-${req.file.originalname}`;
+            
+            await r2.send(new PutObjectCommand({
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: key,
+                Body: req.file.buffer,
+                ContentType: req.file.mimetype,
+            }));
 
-            archivo = resultado.secure_url;
-            public_id = resultado.public_id;
+            archivo = `${process.env.R2_PUBLIC_URL}/${key}`;
+            public_id = key;
         }
 
         
-        await crear_publicacion({titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, dificultad, id_usuario});
+        await crear_publicacion({titulo, descripcion, ingredientes: ingredientes_string, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario});
 
-        const data = {titulo, descripcion, ingredientes, preparacion,  archivo, public_id, tiempo_preparacion, dificultad, id_usuario}
+        const data = {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario}
 
         return respuesta_exito(res, 'Publicacion subida correctamente', 201, data);
     }
@@ -104,8 +100,11 @@ const obtener_publicacion_id = async (req, res) => {
 // Editar una publicacion
 const editar_publicacion = async (req, res) => {
     try{
-        const {titulo, descripcion, ingredientes, preparacion, tiempo_preparacion, dificultad} = req.body;
+        const {titulo, descripcion, ingredientes, preparacion, tiempo_preparacion, tipo_tiempo, dificultad} = req.body;
         const {id_publicacion} = req.params;
+
+        // Convertir el array de ingredientes en JSON
+        const ingredientes_string = JSON.stringify(ingredientes);
 
         const publicacion_actual = await listar_publicacion_id(id_publicacion);
 
@@ -114,40 +113,32 @@ const editar_publicacion = async (req, res) => {
 
         if (req.file) {
 
-            const resultado = await new Promise((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream(
-                    {
-                        folder: 'archivos',
-                        resource_type: 'auto',
-                        transformation: [
-                            { width: 1080, crop: "limit" },
-                            { quality: "auto" }
-                        ]
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                );
+            const key = `archivos/${uuidv4()}-${req.file.originalname}`;
 
-                streamifier.createReadStream(req.file.buffer).pipe(stream);
-            });
+            await r2.send(new PutObjectCommand({
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: key,
+                Body: req.file.buffer,
+                ContentType: req.file.mimetype,
+            }));
 
-            archivo = resultado.secure_url;
-            public_id = resultado.public_id;
+            archivo = `${process.env.R2_PUBLIC_URL}/${key}`;
+            public_id = key;
 
             // borrar imagen anterior
             if (publicacion_actual.publicacion.publicacion_public_id) {
-                await cloudinary.uploader.destroy(
-                    publicacion_actual.publicacion.publicacion_public_id,
-                    { resource_type: "image" }
-                );
+                await r2.send(new DeleteObjectCommand({
+                    Bucket: process.env.R2_BUCKET_NAME,
+                    Key: publicacion_actual.publicacion.publicacion_public_id,
+                }));
             }
         }
 
-        await actualizar_publicacion({titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, dificultad, id_publicacion});
+        await actualizar_publicacion({titulo, descripcion, ingredientes: ingredientes_string, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_publicacion});
 
-        return respuesta_exito(res, 'Publicacion editada correctamente', 200);
+        const data = {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_publicacion};
+
+        return respuesta_exito(res, 'Publicacion editada correctamente', 200, data);
     }
     catch(error){
         return respuesta_error_servidor(res, error, 'No se pudo editar la publicacion');
@@ -162,11 +153,12 @@ const borrar_publicacion = async (req, res) => {
 
         const resultado = await listar_publicacion_id(id_publicacion);
 
-        // borrar imagen de cloudinary
-        if(resultado.publicacion.publicacion_public_id){
-            const resultadoCloudinary = await cloudinary.uploader.destroy(resultado.publicacion.publicacion_public_id, {
-                resource_type: "image"
-            });
+        // borrar imagen de r2
+        if (resultado.publicacion.publicacion_public_id) {  
+            await r2.send(new DeleteObjectCommand({
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: resultado.publicacion.publicacion_public_id, 
+            }));
         }
 
         await eliminar_publicacion(id_publicacion);

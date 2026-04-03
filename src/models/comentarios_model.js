@@ -1,7 +1,7 @@
 const conexion = require('../config/databse');
 
 
-// Listar todos los comentarios de una publicacion
+// Crear comentario
 const crear_comentario = async(datos) => {
     const {contenido, id_usuario, id_publicacion} = datos;
 
@@ -36,7 +36,7 @@ const buscar_comentario = async (id_comentario) => {
 
 // Listar todos los comentarios de una publicacion
 const listar_todos_comentarios = async (id_publicacion) => {
-    const [resultados] = await conexion.execute('SELECT * FROM comentario WHERE id_publicacion = ?', [id_publicacion]);
+    const [resultados] = await conexion.execute('SELECT * FROM comentario WHERE id_publicacion = ? GROUP BY fecha_creacion DESC', [id_publicacion]);
 
     return resultados;
 }
@@ -64,7 +64,8 @@ const listar_comentario_id = async (id_comentario) => {
         FROM respuesta_comentario r
         INNER JOIN usuario u
             ON r.id_usuario = u.id_usuario
-        WHERE r.id_comentario = ?`, [id_comentario]);
+        WHERE r.id_comentario = ?
+        GROUP BY r.fecha_creacion DESC`, [id_comentario]);
 
     return {
         Comentario: info_comentario,

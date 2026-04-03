@@ -57,6 +57,7 @@ const listar_todas_notificaciones = async ({id_usuario}) => {
             INNER JOIN usuario u_e ON n.id_emisor = u_e.id_usuario
             INNER JOIN usuario u ON n.id_usuario = u.id_usuario
         WHERE n.id_usuario = ?
+        GROUP BY fecha_creacion DESC
     `, [id_usuario]);
 
     const resultado = {

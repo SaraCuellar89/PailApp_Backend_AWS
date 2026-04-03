@@ -25,7 +25,10 @@ const generar_token = (usuario) => {
       id_usuario: usuario.id_usuario,
       nombre: usuario.nombre_usuario,
       correo: usuario.correo,
-      avatar: usuario.avatar
+      avatar: usuario.avatar,
+      altura: usuario.altura,
+      peso: usuario.peso,
+      edad: usuario.edad
     },
     SECRET,
     { expiresIn: "7d" }

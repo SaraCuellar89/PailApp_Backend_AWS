@@ -5,6 +5,9 @@ const construir_data_usuario = (usuario, token) => ({
     nombre: usuario.nombre_usuario,
     correo: usuario.correo,
     avatar: usuario.avatar,
+    altura: usuario.altura,
+    peso: usuario.peso,
+    edad: usuario.edad,
     token
 });
 

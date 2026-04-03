@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 dotenv.config();
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "*",
     credentials: true
 }));
 
@@ -27,6 +27,7 @@ const rutas_publicaciones = require('./src/routes/publicacion_routes');
 const rutas_comentarios = require('./src/routes/comentarios_routes');
 const rutas_reacciones = require('./src/routes/reacciones_routes');
 const rutas_guardados = require('./src/routes/guardados_routes');
+const rutas_ingredientes = require('./src/routes/lista_ingredientes_routes');
 const rutas_respuestas = require('./src/routes/respuestas_routes');
 const rutas_notificaciones = require('./src/routes/notificaciones_routes');
 const rutas_filtros = require('./src/routes/filtros_routes');
@@ -50,6 +51,8 @@ app.use('/comentarios', rutas_comentarios);
 app.use('/reacciones', rutas_reacciones);
 // Platos Guardados
 app.use('/guardados', rutas_guardados);
+// Lista de Ingredientes
+app.use('/ingredientes', rutas_ingredientes);
 // Respuestas a comentarios
 app.use('/respuestas', rutas_respuestas);
 // Notificaciones
@@ -59,7 +62,7 @@ app.use('/filtros', rutas_filtros);
 
 
 // ================== Escucha del puerto (numero de puerto en .evn) ================== 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);

@@ -18,7 +18,7 @@ const obtener_notificacion_id = async (req, res) => {
     try {
         const {id_notificacion} = req.params;
         
-        const [notificacion] = await listar_notificacion_id({id_notificacion});
+        const notificacion = await listar_notificacion_id({id_notificacion});
 
         if(notificacion.length == 0){
             return respuesta_error(res, "No existe esa notificacion", 404);

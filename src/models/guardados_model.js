@@ -18,9 +18,10 @@ const buscar_plato_guardado = async (datos) => {
     const [info_plato_guardado] = await conexion.execute(`
         SELECT 
             u.id_usuario AS id_autor_publicacion,
-            u.nombre_usuario as nombre_autor_publicacion,
+            u.nombre_usuario AS nombre_autor_publicacion,
 
-            p.id_publicacion as id_publicacion_reaccionada
+            p.id_publicacion AS id_publicacion_reaccionada,
+            p.ingredientes AS ingredientes_publicacion
         FROM publicacion_guardada pg
             INNER JOIN publicacion p ON pg.id_publicacion = p.id_publicacion
             INNER JOIN usuario u ON p.id_usuario = u.id_usuario
@@ -67,6 +68,7 @@ const listar_platos_guardados = async (id_usuario) => {
         INNER JOIN usuario u_post
         ON p.id_usuario = u_post.id_usuario
         WHERE g.id_usuario = ?    
+        GROUP BY p.fecha_creacion DESC
     `, [id_usuario]);
 
     const datos = {

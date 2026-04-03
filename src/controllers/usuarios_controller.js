@@ -14,8 +14,7 @@ const client = new OAuth2Client(process.env.CLIENT_ID);
 
 
 // ================== Importacion de funciones de error o exito ================== 
-const {
-    respuesta_exito,
+const {respuesta_exito,
     respuesta_error,
     respuesta_error_servidor} = require('../utils/responses')
 
@@ -36,7 +35,8 @@ const {buscar_usuario_correo,
     eliminar_usuario,
     cambiar_tipo_cuenta,
     buscar_correo,
-    actualizar_usuario_contrasena} = require('../models/usuarios_model');
+    actualizar_usuario_contrasena,
+    insertar_datos_adicionales} = require('../models/usuarios_model');
 
 
 // ================== Importacion de Helpers ==================
@@ -64,7 +64,7 @@ const registrar_usuarios = async (req, res) => {
 
         await crear_usuario({nombre_usuario, correo, contrasena:contrasena_encriptada, avatar});
 
-        // enviar_correo_registro(correo, nombre_usuario).catch(console.error);
+        //enviar_correo_registro(correo, nombre_usuario).catch(console.error);
 
         return respuesta_exito(res, 'Usuario registrado correctamente', 201);
     }
@@ -189,6 +189,22 @@ const iniciar_sesion_google = async (req, res) => {
 };
 
 
+// Registrar y/o actualizar datos adicionales del usuario
+const registrar_datos_adicionales = async(req, res) => {
+    try {
+        const {edad, peso, altura} = req.body;
+        const id_usuario = req.usuario.id_usuario;
+
+        await insertar_datos_adicionales({edad, peso, altura, id_usuario});
+
+        return respuesta_exito(res, 'Registro de datos adicionales exitoso', 200)
+
+    } catch (error) {
+        return respuesta_error_servidor(res, error, 'Error al registrar datos adicionales');
+    }
+}
+
+
 // Obtener informacion de usuario en sesion
 const informacion_usuario_token = async(req, res) => {
     return res.json({
@@ -201,7 +217,7 @@ const informacion_usuario_token = async(req, res) => {
 // Editar cuenta del usuario
 const editar_cuenta = async(req, res) => {
     try{
-        const {nombre_usuario, correo, contrasena, confirmacion_contrasena, avatar} = req.body;
+        const {nombre_usuario, correo, contrasena, avatar, altura, peso, edad} = req.body;
         const id_usuario = req.usuario.id_usuario;
 
         const existencia = await obtener_usuario_id(id_usuario);
@@ -210,13 +226,11 @@ const editar_cuenta = async(req, res) => {
             return respuesta_error(res, 'Este usuario no existe', 400)
         }
 
-        if (contrasena != confirmacion_contrasena){
-            return respuesta_error(res, 'Las contraseñas no coinciden', 400)
-        }
+        const contrasena_encriptada = contrasena 
+            ? await encriptar_contrasena(contrasena)
+            : existencia[0].contrasena
 
-        const contrasena_encriptada = await encriptar_contrasena(contrasena)
-
-        await actualizar_usuario({id_usuario, nombre_usuario, correo, contrasena:contrasena_encriptada, avatar});
+        await actualizar_usuario({id_usuario, nombre_usuario, correo, contrasena: contrasena_encriptada, avatar, altura, peso, edad});
 
         return respuesta_exito(res, 'Cuenta editada correctamente', 200)
     }
@@ -321,5 +335,6 @@ module.exports = {
     editar_cuenta,
     eliminar_cuenta,
     solicitar_recuperacion,
-    restablecer_contraseña
+    restablecer_contraseña,
+    registrar_datos_adicionales
 }

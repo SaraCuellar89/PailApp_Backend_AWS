@@ -43,6 +43,16 @@ const cambiar_tipo_cuenta = async (datos) => {
 }
 
 
+// Insertar datos adicionales del usuario
+const insertar_datos_adicionales = async (datos) => {
+    const {edad, peso, altura, id_usuario} = datos;
+
+    const [resultado] = await conexion.execute('UPDATE usuario SET edad = ?, peso = ?, altura = ? WHERE id_usuario = ?', [edad, peso, altura, id_usuario]);
+
+    return resultado;
+}
+
+
 // Buscar usuario por CORREO
 const buscar_correo = async ({correo}) => {
     const [resultado] = await conexion.execute('SELECT * FROM usuario WHERE correo = ?', [correo]);
@@ -69,9 +79,9 @@ const actualizar_usuario_contrasena = async (datos) => {
 
 // Editar usuario
 const actualizar_usuario = async (datos) => {
-    const {id_usuario, nombre_usuario, correo, contrasena, avatar} = datos;
+    const {id_usuario, nombre_usuario, correo, contrasena, avatar, altura, peso, edad} = datos;
 
-    await conexion.execute('UPDATE usuario SET nombre_usuario = ?, correo = ?, contrasena = ?, avatar = ? WHERE id_usuario = ?', [nombre_usuario, correo, contrasena, avatar, id_usuario]);
+    await conexion.execute('UPDATE usuario SET nombre_usuario = ?, correo = ?, contrasena = ?, avatar = ?, altura = ?, peso = ?, edad = ? WHERE id_usuario = ?', [nombre_usuario, correo, contrasena, avatar, altura, peso, edad, id_usuario]);
 }
 
 
@@ -96,5 +106,6 @@ module.exports = {
     eliminar_usuario,
     cambiar_tipo_cuenta,
     buscar_correo,
-    actualizar_usuario_contrasena
+    actualizar_usuario_contrasena,
+    insertar_datos_adicionales
 }
