@@ -5,9 +5,12 @@ const rateLimit = require('express-rate-limit');
 const limite_recuperacion = rateLimit({
     windowMs: 60 * 60 * 1000, // ventana de 1 hora
     max: 5, // máximo 5 intentos por hora
+    keyGenerator: (req) => {
+        return req.body.correo || req.ip;
+    },
     message: {
         success: false,
-        mensaje: 'Demasiados intentos, espera una hora antes de volver a intentarlo'
+        message: 'Demasiados intentos, espera una hora antes de volver a intentarlo'
     },
     standardHeaders: true,
     legacyHeaders: false
@@ -18,9 +21,12 @@ const limite_recuperacion = rateLimit({
 const limite_inicio_sesion = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 10,
+    keyGenerator: (req) => {
+        return req.body.correo || req.ip;
+    },
     message: {
         success: false,
-        mensaje: 'Demasiados intentos, espera 15 minutos'
+        message: 'Demasiados intentos, espera 15 minutos'
     },
     standardHeaders: true,
     legacyHeaders: false
