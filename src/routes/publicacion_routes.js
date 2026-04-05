@@ -16,13 +16,13 @@ const {subir_publicacion,
 // ================== Rutas ==================
 
 // Subir publicacion
-router.post('/subir', auth, validar_subir_publicacion, upload.single('archivo'), subir_publicacion);
+router.post('/subir', auth, upload.single('archivo'), validar_subir_publicacion, subir_publicacion);
 // Obtener todas las publicaciones
 router.get('/todas', auth, obtener_todas_publicaciones);
 // Obtener una publicacion por su ID
 router.get('/una/:id_publicacion', auth, obtener_publicacion_id);
 // Editar publicacion
-router.put('/editar/:id_publicacion', auth, validar_subir_publicacion, upload.single('archivo'), editar_publicacion);
+router.put('/editar/:id_publicacion', auth, upload.single('archivo'), validar_subir_publicacion,  editar_publicacion);
 // Eliminar publicacion
 router.delete('/eliminar/:id_publicacion', auth, borrar_publicacion);
 
