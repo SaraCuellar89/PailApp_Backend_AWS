@@ -20,7 +20,7 @@ const contestar_comentario = async (req, res) => {
         const id_usuario = req.usuario.id_usuario;
         const {id_comentario} = req.params;
 
-        await crear_respuesta({contenido, id_usuario, id_comentario});
+        await crear_respuesta({contenido, fecha_creacion, id_usuario, id_comentario});
 
         return respuesta_exito(res, "Respuesta subida correctamente", 201);
     }

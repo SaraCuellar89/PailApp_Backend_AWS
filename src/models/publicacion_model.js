@@ -3,37 +3,46 @@ const conexion = require('../config/databse');
 
 // Crear una publicacion
 const crear_publicacion = async (datos) => {
-    const {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario} = datos;
+    const {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, fecha_creacion, id_usuario} = datos;
 
-    await conexion.execute('INSERT INTO publicacion (titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [titulo, descripcion, ingredientes, preparacion,  archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario]);
+    await conexion.execute('INSERT INTO publicacion (titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, fecha_creacion, id_usuario) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [titulo, descripcion, ingredientes, preparacion,  archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, fecha_creacion, id_usuario]);
 }
 
 
 // Listar todas las publicaciones
-const listar_todas_publicaciones = async () => {
+const listar_todas_publicaciones = async (id_usuario) => {
     const [resultados] = await conexion.execute(`
         SELECT
             p.*,
             COUNT(DISTINCT c.id_comentario) AS total_comentarios,
-            COUNT(DISTINCT r.id_usuario) AS total_reacciones
+            COUNT(DISTINCT r.id_usuario) AS total_reacciones,
+            EXISTS (
+                SELECT 1 FROM reaccion r2 
+                WHERE r2.id_publicacion = p.id_publicacion 
+                AND r2.id_usuario = ?
+            ) AS usuario_ya_reacciono,
+            EXISTS (
+                SELECT 1 FROM publicacion_guardada pg 
+                WHERE pg.id_publicacion = p.id_publicacion 
+                AND pg.id_usuario = ?
+            ) AS usuario_ya_guardo
         FROM publicacion p
         LEFT JOIN comentario c 
             ON c.id_publicacion = p.id_publicacion
         LEFT JOIN reaccion r 
             ON r.id_publicacion = p.id_publicacion
         GROUP BY p.id_publicacion
-        ORDER BY p.fecha_creacion DESC    
-    `);
+        ORDER BY p.fecha_creacion DESC        
+    `, [id_usuario, id_usuario]);
 
     return resultados;
 }
 
 
 // Obtener publicacion por ID
-const listar_publicacion_id = async (id_publicacion) => {
+const listar_publicacion_id = async (id_usuario, id_publicacion) => {
     const [info_publicacion] = await conexion.execute(`
         SELECT 
-        -- ================== PUBLICACION ==================
         p.id_publicacion        AS publicacion_id,
         p.titulo                AS publicacion_titulo,
         p.descripcion           AS publicacion_descripcion,
@@ -46,16 +55,23 @@ const listar_publicacion_id = async (id_publicacion) => {
         p.dificultad            AS publicacion_dificultad,
         p.fecha_creacion        AS publicacion_fecha,
         p.id_usuario            AS publicacion_autor_id,
-        -- ================== AUTOR DEL POST ==================
         u_post.id_usuario       AS autor_post_id,
-        u_post.nombre_usuario  AS autor_post_nombre,
-        u_post.avatar          AS autor_post_avatar
+        u_post.nombre_usuario   AS autor_post_nombre,
+        u_post.avatar           AS autor_post_avatar,
+        EXISTS (
+            SELECT 1 FROM reaccion r2 
+            WHERE r2.id_publicacion = p.id_publicacion 
+            AND r2.id_usuario = ?
+        ) AS ya_reacciono,
+        EXISTS (
+            SELECT 1 FROM publicacion_guardada pg 
+            WHERE pg.id_publicacion = p.id_publicacion 
+            AND pg.id_usuario = ?
+        ) AS ya_guardo
         FROM publicacion p
-        -- Autor de la publicación
-        INNER JOIN usuario u_post
-        ON p.id_usuario = u_post.id_usuario
+        INNER JOIN usuario u_post ON p.id_usuario = u_post.id_usuario
         WHERE p.id_publicacion = ?
-    `, [id_publicacion]);
+    `, [id_usuario, id_usuario, id_publicacion]); 
 
     const [total_reacciones] = await conexion.execute(`SELECT COUNT(*) as total_reacciones FROM reaccion WHERE id_publicacion = ?`, [id_publicacion])
 

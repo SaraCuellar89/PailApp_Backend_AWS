@@ -3,9 +3,9 @@ const conexion = require('../config/databse');
 
 // Crear notificacion
 const crear_noticiacion = async (datos) => {
-    const {tipo, id_usuario, id_emisor, id_publicacion} = datos;
+    const {tipo, fecha_creacion, id_usuario, id_emisor, id_publicacion} = datos;
 
-    await conexion.execute('INSERT INTO notificacion (tipo, id_usuario, id_emisor, id_publicacion) VALUES (?, ?, ?, ?)', [tipo, id_usuario, id_emisor, id_publicacion]);
+    await conexion.execute('INSERT INTO notificacion (tipo, fecha_creacion, id_usuario, id_emisor, id_publicacion) VALUES (?, ?, ?, ?, ?)', [tipo, fecha_creacion, id_usuario, id_emisor, id_publicacion]);
 }
 
 

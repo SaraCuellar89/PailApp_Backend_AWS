@@ -3,9 +3,9 @@ const conexion = require('../config/databse');
 
 // Crear comentario
 const crear_comentario = async(datos) => {
-    const {contenido, id_usuario, id_publicacion} = datos;
+    const {contenido, fecha_creacion, id_usuario, id_publicacion} = datos;
 
-    const [resultado] = await conexion.execute('INSERT INTO comentario (contenido, id_usuario, id_publicacion) VALUES(?, ?, ?)', [contenido, id_usuario, id_publicacion]);
+    const [resultado] = await conexion.execute('INSERT INTO comentario (contenido, fecha_creacion, id_usuario, id_publicacion) VALUES(?, ?, ?, ?)', [contenido, fecha_creacion, id_usuario, id_publicacion]);
 
     const id_comentario = resultado.insertId;
 

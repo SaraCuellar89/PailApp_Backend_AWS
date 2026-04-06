@@ -36,7 +36,9 @@ const notificar = async (datos) => {
         }
     }
 
-    await crear_noticiacion({tipo, id_usuario, id_emisor, id_publicacion});
+    const fecha_creacion = new Date().toISOString();
+
+    await crear_noticiacion({tipo, fecha_creacion, id_usuario, id_emisor, id_publicacion});
 
     // Enviar push
     try {

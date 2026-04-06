@@ -77,10 +77,9 @@ const registrar_usuarios = async (req, res) => {
 // Iniciar Sesion 
 const iniciar_sesion = async(req, res) => {
     try{
-        const {correo, contrasena} = req.body;
-        console.log('Body recibido:', req.body)
+        const {correo, contrasena} = req.body
 
-        const busqueda = await buscar_usuario_correo(correo);
+        const busqueda = await buscar_usuario_correo(correo)
 
         if(busqueda.length === 0){
             return respuesta_error(res, 'Esa cuenta no esta registrada', 404)

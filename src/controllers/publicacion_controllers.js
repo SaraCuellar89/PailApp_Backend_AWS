@@ -21,7 +21,7 @@ const {crear_publicacion,
 // Subir una publicacion
 const subir_publicacion = async (req, res) => {
     try{
-        const {titulo, descripcion, ingredientes, preparacion, tiempo_preparacion, tipo_tiempo, dificultad} = req.body;
+        const {titulo, descripcion, ingredientes, preparacion, tiempo_preparacion, tipo_tiempo, dificultad, fecha_creacion} = req.body;
         const id_usuario = req.usuario.id_usuario;
 
         // Convertir el array de ingredientes en JSON
@@ -50,7 +50,7 @@ const subir_publicacion = async (req, res) => {
         }
 
         
-        await crear_publicacion({titulo, descripcion, ingredientes: ingredientes_string, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario});
+        await crear_publicacion({titulo, descripcion, ingredientes: ingredientes_string, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, fecha_creacion, id_usuario});
 
         const data = {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_usuario}
 
@@ -65,10 +65,11 @@ const subir_publicacion = async (req, res) => {
 // Listar todas las publicaciones
 const obtener_todas_publicaciones = async (req, res) => {
     try{
-        const resultados = await listar_todas_publicaciones();
+        const id_usuario = req.usuario.id_usuario; 
+
+        const resultados = await listar_todas_publicaciones(id_usuario);
 
         return respuesta_exito(res, 'Listado de publicaciones', 200, resultados);
-
     }
     catch(error){
         return respuesta_error_servidor(res, error, 'No se pudo obtener todas las publicaciones');
@@ -80,10 +81,9 @@ const obtener_todas_publicaciones = async (req, res) => {
 const obtener_publicacion_id = async (req, res) => {
     try{
         const {id_publicacion} = req.params;
+        const id_usuario = req.usuario.id_usuario; 
 
-        const resultado = await listar_publicacion_id(id_publicacion);
-
-        console.log(resultado.publicacion.publicacion_public_id)
+        const resultado = await listar_publicacion_id(id_usuario, id_publicacion);
 
         if (resultado.length === 0) {
             return respuesta_error(res, 'Esa publicacion no existe', 404);

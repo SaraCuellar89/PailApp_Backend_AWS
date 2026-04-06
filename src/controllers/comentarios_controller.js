@@ -21,11 +21,11 @@ const {listar_todos_comentarios,
 // Subir comentario
 const subir_comentario = async (req, res) => {
     try{
-        const {contenido} = req.body;
+        const {contenido, fecha_creacion} = req.body;
         const {id_publicacion} = req.params;
         const id_usuario = req.usuario.id_usuario;
 
-        const comentario = await crear_comentario({contenido, id_usuario, id_publicacion});
+        const comentario = await crear_comentario({contenido, fecha_creacion, id_usuario, id_publicacion});
 
         const resultado = await buscar_comentario(comentario[0].id_comentario)
 

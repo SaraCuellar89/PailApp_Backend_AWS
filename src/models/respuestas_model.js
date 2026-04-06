@@ -3,9 +3,9 @@ const conexion = require('../config/databse');
 
 // Crear Respuesta
 const crear_respuesta = async (datos) => {
-    const {contenido, id_usuario, id_comentario} = datos;
+    const {contenido, fecha_creacion, id_usuario, id_comentario} = datos;
 
-    await conexion.execute('INSERT INTO respuesta_comentario (contenido, id_usuario, id_comentario) VALUES (?, ?, ?)', [contenido, id_usuario, id_comentario]);
+    await conexion.execute('INSERT INTO respuesta_comentario (contenido, fecha_creacion, id_usuario, id_comentario) VALUES (?, ?, ?, ?)', [contenido, fecha_creacion, id_usuario, id_comentario]);
 }
 
 
