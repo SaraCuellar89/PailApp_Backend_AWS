@@ -192,10 +192,10 @@ const iniciar_sesion_google = async (req, res) => {
 // Registrar y/o actualizar datos adicionales del usuario
 const registrar_datos_adicionales = async(req, res) => {
     try {
-        const {edad, peso, altura} = req.body;
+        const {edad, peso, altura, sexo} = req.body;
         const id_usuario = req.usuario.id_usuario;
 
-        await insertar_datos_adicionales({edad, peso, altura, id_usuario});
+        await insertar_datos_adicionales({edad, peso, altura, sexo, id_usuario});
 
         return respuesta_exito(res, 'Registro de datos adicionales exitoso', 200)
 
@@ -217,7 +217,7 @@ const informacion_usuario_token = async(req, res) => {
 // Editar cuenta del usuario
 const editar_cuenta = async(req, res) => {
     try{
-        const {nombre_usuario, correo, contrasena, avatar, altura, peso, edad} = req.body;
+        const {nombre_usuario, correo, contrasena, avatar, altura, peso, edad, sexo} = req.body;
         const id_usuario = req.usuario.id_usuario;
 
         const existencia = await obtener_usuario_id(id_usuario);
@@ -230,7 +230,7 @@ const editar_cuenta = async(req, res) => {
             ? await encriptar_contrasena(contrasena)
             : existencia[0].contrasena
 
-        await actualizar_usuario({id_usuario, nombre_usuario, correo, contrasena: contrasena_encriptada, avatar, altura, peso, edad});
+        await actualizar_usuario({id_usuario, nombre_usuario, correo, contrasena: contrasena_encriptada, avatar, altura, peso, edad, sexo});
 
         return respuesta_exito(res, 'Cuenta editada correctamente', 200)
     }

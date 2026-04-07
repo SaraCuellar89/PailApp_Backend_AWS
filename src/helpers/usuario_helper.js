@@ -8,6 +8,7 @@ const construir_data_usuario = (usuario, token) => ({
     altura: usuario.altura,
     peso: usuario.peso,
     edad: usuario.edad,
+    sexo: usuario.sexo,
     token
 });
 

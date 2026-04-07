@@ -12,8 +12,7 @@ const upload = multer({
         const tipos_permitidos = [
             'image/jpeg',
             'image/png',
-            'image/jpg',
-            'video/mp4'
+            'image/jpg'
         ];
 
         if (tipos_permitidos.includes(file.mimetype)) {

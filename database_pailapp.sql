@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0.1
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-03-2026 a las 15:32:17
--- Versión del servidor: 10.1.32-MariaDB
--- Versión de PHP: 7.2.5
+-- Tiempo de generación: 07-04-2026 a las 23:00:12
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -31,10 +30,10 @@ SET time_zone = "+00:00";
 CREATE TABLE `comentario` (
   `id_comentario` int(5) NOT NULL,
   `contenido` varchar(255) DEFAULT NULL,
-  `fecha_creacion` datetime DEFAULT CURRENT_TIMESTAMP,
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
   `id_usuario` int(5) NOT NULL,
   `id_publicacion` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -46,8 +45,8 @@ CREATE TABLE `dispositivo` (
   `id_dispositivo` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
   `fcm_token` varchar(255) NOT NULL,
-  `fecha_actualizacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `fecha_actualizacion` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -60,20 +59,8 @@ CREATE TABLE `ingrediente_guardado` (
   `id_usuario` int(5) NOT NULL,
   `id_publicacion` int(5) NOT NULL,
   `nombre` varchar(150) NOT NULL,
-  `obtenido` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `ingrediente_guardado`
---
-
-INSERT INTO `ingrediente_guardado` (`id_ingrediente`, `id_usuario`, `id_publicacion`, `nombre`, `obtenido`) VALUES
-(1, 3, 1, '1 pechuga de pollo', 0),
-(2, 3, 1, '1 zanahoria', 0),
-(3, 3, 1, '1/2 cebolla', 0),
-(4, 3, 1, '1 diente de ajo', 0),
-(5, 3, 1, '2 tazas de caldo de pollo', 0),
-(6, 3, 1, 'Sal al gusto', 0);
+  `obtenido` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -84,18 +71,11 @@ INSERT INTO `ingrediente_guardado` (`id_ingrediente`, `id_usuario`, `id_publicac
 CREATE TABLE `notificacion` (
   `id_notificacion` int(5) NOT NULL,
   `tipo` enum('like','comentario','guardado') DEFAULT NULL,
-  `fecha_creacion` datetime DEFAULT CURRENT_TIMESTAMP,
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
   `id_usuario` int(5) NOT NULL,
   `id_emisor` int(5) NOT NULL,
   `id_publicacion` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `notificacion`
---
-
-INSERT INTO `notificacion` (`id_notificacion`, `tipo`, `fecha_creacion`, `id_usuario`, `id_emisor`, `id_publicacion`) VALUES
-(1, 'guardado', '2026-03-13 09:02:48', 1, 3, 1);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -106,24 +86,17 @@ INSERT INTO `notificacion` (`id_notificacion`, `tipo`, `fecha_creacion`, `id_usu
 CREATE TABLE `publicacion` (
   `id_publicacion` int(5) NOT NULL,
   `titulo` varchar(100) DEFAULT NULL,
-  `descripcion` text,
-  `ingredientes` longtext,
-  `preparacion` text,
+  `descripcion` text DEFAULT NULL,
+  `ingredientes` longtext DEFAULT NULL,
+  `preparacion` text DEFAULT NULL,
   `archivo` varchar(255) DEFAULT NULL,
   `public_id` varchar(250) DEFAULT NULL,
   `tiempo_preparacion` int(5) DEFAULT NULL,
   `tipo_tiempo` enum('min','h') DEFAULT NULL,
   `dificultad` varchar(20) DEFAULT NULL,
-  `fecha_creacion` datetime DEFAULT CURRENT_TIMESTAMP,
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
   `id_usuario` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `publicacion`
---
-
-INSERT INTO `publicacion` (`id_publicacion`, `titulo`, `descripcion`, `ingredientes`, `preparacion`, `archivo`, `public_id`, `tiempo_preparacion`, `tipo_tiempo`, `dificultad`, `fecha_creacion`, `id_usuario`) VALUES
-(1, 'Arroz con pollo', 'Un plato tradicional con arroz, pollo y verduras.', '[\"1 pechuga de pollo\",\"1 zanahoria\",\"1/2 cebolla\",\"1 diente de ajo\",\"2 tazas de caldo de pollo\",\"Sal al gusto\"]', 'Cocinar el pollo, sofreír las verduras, agregar el arroz y el caldo, y cocinar hasta que el arroz esté listo.', NULL, NULL, 45, '', 'media', '2026-03-13 07:16:26', 1);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -134,14 +107,7 @@ INSERT INTO `publicacion` (`id_publicacion`, `titulo`, `descripcion`, `ingredien
 CREATE TABLE `publicacion_guardada` (
   `id_usuario` int(5) NOT NULL,
   `id_publicacion` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `publicacion_guardada`
---
-
-INSERT INTO `publicacion_guardada` (`id_usuario`, `id_publicacion`) VALUES
-(3, 1);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -152,7 +118,7 @@ INSERT INTO `publicacion_guardada` (`id_usuario`, `id_publicacion`) VALUES
 CREATE TABLE `reaccion` (
   `id_usuario` int(5) NOT NULL,
   `id_publicacion` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -163,10 +129,10 @@ CREATE TABLE `reaccion` (
 CREATE TABLE `respuesta_comentario` (
   `id_respuesta` int(5) NOT NULL,
   `contenido` varchar(255) DEFAULT NULL,
-  `fecha_creacion` datetime DEFAULT CURRENT_TIMESTAMP,
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
   `id_usuario` int(5) NOT NULL,
   `id_comentario` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -184,16 +150,9 @@ CREATE TABLE `usuario` (
   `google_id` varchar(100) DEFAULT NULL,
   `altura` decimal(3,2) DEFAULT NULL,
   `peso` decimal(5,2) DEFAULT NULL,
-  `edad` int(2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `usuario`
---
-
-INSERT INTO `usuario` (`id_usuario`, `nombre_usuario`, `correo`, `contrasena`, `avatar`, `proveedor`, `google_id`, `altura`, `peso`, `edad`) VALUES
-(1, 'Juan Perez', 'juan.perez@email.com', '$2b$10$3j8d3gJtYza9/ihiyWgLKuQUiReToSbwFLvIktthyFYVol8bziuXK', 'img', 'local', NULL, '1.80', '68.00', 22),
-(3, 'Marta Lopez', 'marta@email.com', '$2b$10$nUY43xLGtq31JVTvYmFMJ.H7ndzgThW8o1evx1FgaGy4CVpXt35tG', 'img', 'local', NULL, NULL, NULL, NULL);
+  `edad` int(2) DEFAULT NULL,
+  `sexo` enum('Masculino','Femenino','Prefiero no decirlo') DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -206,8 +165,8 @@ CREATE TABLE `verificacion` (
   `id_usuario` int(11) NOT NULL,
   `token` varchar(255) NOT NULL,
   `expira` datetime NOT NULL,
-  `fecha_creacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Índices para tablas volcadas
@@ -307,19 +266,19 @@ ALTER TABLE `dispositivo`
 -- AUTO_INCREMENT de la tabla `ingrediente_guardado`
 --
 ALTER TABLE `ingrediente_guardado`
-  MODIFY `id_ingrediente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_ingrediente` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `notificacion`
 --
 ALTER TABLE `notificacion`
-  MODIFY `id_notificacion` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_notificacion` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `publicacion`
 --
 ALTER TABLE `publicacion`
-  MODIFY `id_publicacion` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_publicacion` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `respuesta_comentario`
@@ -331,7 +290,7 @@ ALTER TABLE `respuesta_comentario`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_usuario` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `verificacion`
