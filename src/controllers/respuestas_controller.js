@@ -16,7 +16,7 @@ const {crear_respuesta,
 // Contestar a un comentario
 const contestar_comentario = async (req, res) => {
     try{
-        const {contenido} = req.body;
+        const {contenido, fecha_creacion} = req.body;
         const id_usuario = req.usuario.id_usuario;
         const {id_comentario} = req.params;
 
