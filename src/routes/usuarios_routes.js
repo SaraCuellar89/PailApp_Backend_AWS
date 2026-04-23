@@ -23,10 +23,10 @@ const {registrar_usuarios,
 
 // Registrar un usuario
 router.post('/registrar', validar_registro, registrar_usuarios);
-// Registrar datos adicionales del usuario (edad, peso, altura)
-router.put('/registrar_datos_adicionales', auth, validar_datos_adicionales, registrar_datos_adicionales);
 // Iniciar sesion
 router.post('/iniciar_sesion', limite_inicio_sesion, iniciar_sesion);
+// Registrar datos adicionales delregistrar usuario (edad, peso, altura)
+router.put('/registrar_datos_adicionales', auth, validar_datos_adicionales, registrar_datos_adicionales);
 // Iniciar sesion Google
 router.post('/iniciar_sesion_google', iniciar_sesion_google);
 // Buscar informacion de un usuario en sesion por medio del token
@@ -38,8 +38,8 @@ router.delete('/eliminar_cuenta', auth, eliminar_cuenta);
 
 // Solicitar restablecimiento de contraseña
 router.post('/contrasena_olvidada', limite_recuperacion, solicitar_recuperacion);
-// REstablecer contraseña
-router.post('/contrasena_olvidada/:token', restablecer_contraseña);
+// Restablecer contraseña
+router.post('/restablecer_contrasena', restablecer_contraseña);
 
 
 

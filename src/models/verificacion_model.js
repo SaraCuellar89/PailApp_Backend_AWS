@@ -3,11 +3,11 @@ const conexion = require('../config/databse');
 
 // Crear Token 
 const crear_token = async (datos) => {
-    const {id_usuario, token, expira} = datos;
+    const {id_usuario, token} = datos;
 
     await conexion.execute('DELETE FROM verificacion WHERE id_usuario = ?', [id_usuario]);
 
-    const [resultado] = await conexion.execute('INSERT INTO verificacion (id_usuario, token, expira) VALUES(?, ?, ?)', [id_usuario, token, expira]);
+    const [resultado] = await conexion.execute('INSERT INTO verificacion (id_usuario, token, expira) VALUES(?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))', [id_usuario, token]);
 
     return resultado;
 }

@@ -75,18 +75,6 @@ const listar_publicacion_id = async (id_usuario, id_publicacion) => {
 
     const [total_reacciones] = await conexion.execute(`SELECT COUNT(*) as total_reacciones FROM reaccion WHERE id_publicacion = ?`, [id_publicacion])
 
-    const [info_reacciones] = await conexion.execute(`
-        SELECT 
-        u.id_usuario as reaccion_autor_id,
-        u.nombre_usuario as reaccion_autor_nombre_usuario,
-        u.correo as reaccion_autor_correo,
-        u.avatar as reaccion_autor_avatar
-        FROM reaccion r
-        INNER JOIN usuario u
-        ON r.id_usuario = u.id_usuario
-        WHERE id_publicacion = ?
-    `, [id_publicacion]);
-
     const [total_comentarios] = await conexion.execute('SELECT COUNT(*) as total_comentarios FROM comentario WHERE id_publicacion = ?', [id_publicacion]);
 
     const [info_comentarios] = await conexion.execute(`
@@ -111,14 +99,42 @@ const listar_publicacion_id = async (id_usuario, id_publicacion) => {
         GROUP BY c.fecha_creacion DESC
     `, [id_publicacion]);
 
+    const [info_respuestas] = await conexion.execute(`
+        SELECT 
+        r.id_respuesta          AS respuesta_id,
+        r.contenido             AS respuesta_contenido,
+        r.fecha_creacion        AS respuesta_fecha,
+        r.id_comentario         AS respuesta_comentario_id,
+        r.id_usuario            AS respuesta_autor_id,
+        u_resp.id_usuario       AS autor_respuesta_id,
+        u_resp.nombre_usuario   AS autor_respuesta_nombre,
+        u_resp.avatar           AS autor_respuesta_avatar
+        FROM respuesta_comentario r
+        INNER JOIN comentario c ON r.id_comentario = c.id_comentario
+        INNER JOIN usuario u_resp ON r.id_usuario = u_resp.id_usuario
+        WHERE c.id_publicacion = ?
+        ORDER BY r.fecha_creacion ASC
+    `, [id_publicacion])
+
+    const respuestas_por_comentario = info_respuestas.reduce((acc, respuesta) => {
+        const id = respuesta.respuesta_comentario_id;
+        if (!acc[id]) acc[id] = [];
+        acc[id].push(respuesta);
+        return acc;
+    }, {});
+
+    const comentarios_con_respuestas = info_comentarios.map(comentario => ({
+        ...comentario,
+        respuestas: respuestas_por_comentario[comentario.comentario_id] || []
+    }));
+
     const resultado = {
         publicacion: info_publicacion[0] || null,
-        total_reacciones,
-        informacion_reacciones: info_reacciones,
-        total_comentarios,
-        comentarios: info_comentarios
+        total_reacciones: total_reacciones[0].total_reacciones,
+        total_comentarios: total_comentarios[0].total_comentarios,
+        comentarios: comentarios_con_respuestas
     };
-
+    
     return resultado;
 }
 

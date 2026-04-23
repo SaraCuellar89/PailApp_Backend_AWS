@@ -12,14 +12,6 @@ const insertar_ingredientes = async ({id_usuario, id_publicacion, ingredientes})
 }
 
 
-// Registrar un solo ingrediente
-const insertar_un_ingrediente = async ({id_usuario, id_publicacion, nombre}) => {
-    const [resultado] = await conexion.execute('INSERT INTO ingrediente_guardado (id_usuario, id_publicacion, nombre) VALUES (?, ?, ?)', [id_usuario, id_publicacion, nombre]);
-
-    return resultado;
-}
-
-
 // Listar todos los ingredientes
 const listar_todos_ingredientes = async ({id_usuario, id_publicacion}) => {
     const [resultado] = await conexion.execute('SELECT * FROM ingrediente_guardado WHERE id_usuario = ? AND id_publicacion = ?', [id_usuario, id_publicacion]);
@@ -44,21 +36,6 @@ const editar_estado_ingrediente = async ({id_ingrediente, obtenido}) => {
 }
 
 
-// Editar ingrediente
-const actualizar_ingrediente = async ({id_ingrediente, nombre}) => {
-    const [resultado] = await conexion.execute('UPDATE ingrediente_guardado SET nombre = ? WHERE id_ingrediente = ?', [nombre, id_ingrediente]);
-
-    return resultado;
-}
-
-
-// Eliminar ingrediente
-const eliminar_ingrediente = async ({id_ingrediente}) => {
-    const [resultado] = await conexion.execute('DELETE FROM ingrediente_guardado WHERE id_ingrediente = ?', [id_ingrediente]);
-
-    return resultado;
-}
-
 // Eliminar todos los ingredientes que tienen relacion con una publicacion
 const eliminar_todos_ingredientes = async ({id_publicacion, id_usuario}) => {
     const [resultado] = await conexion.execute('DELETE FROM ingrediente_guardado WHERE id_publicacion = ? and id_usuario = ?', [id_publicacion, id_usuario]);
@@ -71,11 +48,8 @@ const eliminar_todos_ingredientes = async ({id_publicacion, id_usuario}) => {
 // ================== Exportar funciones ==================
 module.exports = {
     insertar_ingredientes, 
-    insertar_un_ingrediente,
     listar_todos_ingredientes,
     lista_ingrediente_id,
     editar_estado_ingrediente,
-    actualizar_ingrediente,
-    eliminar_ingrediente,
     eliminar_todos_ingredientes
 }

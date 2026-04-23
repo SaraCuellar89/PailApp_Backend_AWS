@@ -15,7 +15,9 @@ const {listar_popularidad,
 // Filtrar por popularidad
 const filtrar_pupularidad = async (req, res) => {
     try {
-        const platos = await listar_popularidad();
+        const id_usuario = req.usuario.id_usuario; 
+
+        const platos = await listar_popularidad(id_usuario);
 
         if(platos.length == 0){
             return respuesta_error(res, "No hay platos", 404);
@@ -32,7 +34,9 @@ const filtrar_pupularidad = async (req, res) => {
 // Filtrar por antiguedad
 const filtrar_antiguedad = async (req, res) => {
     try {
-        const platos = await listar_atiguedad();
+        const id_usuario = req.usuario.id_usuario; 
+
+        const platos = await listar_atiguedad(id_usuario);
 
         if(platos.length == 0){
             return respuesta_error(res, "No hay platos", 404);
@@ -49,7 +53,9 @@ const filtrar_antiguedad = async (req, res) => {
 // Filtrar por antiguedad
 const filtrar_recientes = async (req, res) => {
     try {
-        const platos = await listar_recientes();
+        const id_usuario = req.usuario.id_usuario; 
+
+        const platos = await listar_recientes(id_usuario);
 
         if(platos.length == 0){
             return respuesta_error(res, "No hay platos", 404);

@@ -11,11 +11,11 @@ const {filtrar_pupularidad,
 
 // ================== Rutas ==================
 // Filtrar platos por poupularidad
-router.get('/popularidad', filtrar_pupularidad);
+router.get('/populares', auth, filtrar_pupularidad);
 // Filtrar platos por antiguedad
-router.get('/antiguedad', filtrar_antiguedad);
+router.get('/antiguedad', auth, filtrar_antiguedad);
 // Filtrar platos por mas recientes
-router.get('/recientes', filtrar_recientes);
+router.get('/recientes', auth, filtrar_recientes);
 
 
 

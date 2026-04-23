@@ -279,9 +279,8 @@ const solicitar_recuperacion = async (req, res) => {
         }
 
         const token = Math.floor(10000 + Math.random() * 90000).toString(); // codigo de 5 numeros
-        const expira = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
-        await crear_token({id_usuario: usuario.id_usuario, token, expira});
+        await crear_token({id_usuario: usuario.id_usuario, token});
 
         enviar_correo_recuperacion(correo, usuario.nombre_usuario, token).catch(console.error);
 
@@ -296,8 +295,7 @@ const solicitar_recuperacion = async (req, res) => {
 // Restablecer contraseña
 const restablecer_contraseña = async (req, res) => {
     try {
-        const {token} = req.params;
-        const {contrasena, confirmacion_contrasena} = req.body;   
+        const {token, contrasena, confirmacion_contrasena} = req.body;   
 
         if(contrasena !== confirmacion_contrasena){
             return respuesta_error(res, 'Las contraseñas no coinciden', 400);

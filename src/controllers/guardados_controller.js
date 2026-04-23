@@ -49,7 +49,11 @@ const guardar_plato = async (req, res) => {
         }
 
         // Insertar ingredientes en una lista personalizable
-        const ingredientes = JSON.parse(resultado.info_plato_guardado.ingredientes_publicacion);
+        const ingredientes_raw = resultado.info_plato_guardado.ingredientes_publicacion;
+
+        const ingredientes = typeof ingredientes_raw === 'string' && ingredientes_raw.startsWith('"')
+            ? JSON.parse(JSON.parse(ingredientes_raw))
+            : JSON.parse(ingredientes_raw);
 
         await insertar_ingredientes({id_usuario, id_publicacion, ingredientes});
 

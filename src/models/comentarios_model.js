@@ -69,7 +69,7 @@ const listar_comentario_id = async (id_comentario) => {
 
     return {
         Comentario: info_comentario,
-        total_respuestas,
+        total_respuestas: total_respuestas[0].total_respuestas,
         respuestas: info_respuestas
     };
 }

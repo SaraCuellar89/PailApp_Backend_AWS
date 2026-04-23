@@ -25,7 +25,9 @@ const subir_publicacion = async (req, res) => {
         const id_usuario = req.usuario.id_usuario;
 
         // Convertir el array de ingredientes en JSON
-        const ingredientes_string = JSON.stringify(ingredientes);
+        const ingredientes_string = typeof ingredientes === 'string' 
+            ? ingredientes 
+            : JSON.stringify(ingredientes);
 
         // Por si el usuario no sube ningun archivo, estos campos se guardan como nulos en la bbdd
         let archivo = null;
@@ -102,11 +104,12 @@ const editar_publicacion = async (req, res) => {
     try{
         const {titulo, descripcion, ingredientes, preparacion, tiempo_preparacion, tipo_tiempo, dificultad} = req.body;
         const {id_publicacion} = req.params;
+        const id_usuario = req.usuario.id_usuario;
 
         // Convertir el array de ingredientes en JSON
         const ingredientes_string = JSON.stringify(ingredientes);
 
-        const publicacion_actual = await listar_publicacion_id(id_publicacion);
+        const publicacion_actual = await listar_publicacion_id(id_usuario, id_publicacion);
 
         let archivo = publicacion_actual.publicacion?.publicacion_archivo ?? null;
         let public_id = publicacion_actual.publicacion?.publicacion_public_id ?? null;
@@ -150,8 +153,9 @@ const editar_publicacion = async (req, res) => {
 const borrar_publicacion = async (req, res) => {
     try{
         const {id_publicacion} = req.params;
+        const id_usuario = req.usuario.id_usuario;
 
-        const resultado = await listar_publicacion_id(id_publicacion);
+        const resultado = await listar_publicacion_id(id_usuario, id_publicacion);
 
         // borrar imagen de r2
         if (resultado.publicacion.publicacion_public_id) {  
