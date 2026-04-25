@@ -139,6 +139,37 @@ const listar_publicacion_id = async (id_usuario, id_publicacion) => {
 }
 
 
+// Listar todas las publicaciones de un usuario
+const listar_publicaciones_usuario = async (id_usuario) => {
+    const [resultados] = await conexion.execute(`
+        SELECT
+            p.*,
+            COUNT(DISTINCT c.id_comentario) AS total_comentarios,
+            COUNT(DISTINCT r.id_usuario) AS total_reacciones,
+            EXISTS (
+                SELECT 1 FROM reaccion r2 
+                WHERE r2.id_publicacion = p.id_publicacion 
+                AND r2.id_usuario = ?
+            ) AS usuario_ya_reacciono,
+            EXISTS (
+                SELECT 1 FROM publicacion_guardada pg 
+                WHERE pg.id_publicacion = p.id_publicacion 
+                AND pg.id_usuario = ?
+            ) AS usuario_ya_guardo
+        FROM publicacion p
+        LEFT JOIN comentario c 
+            ON c.id_publicacion = p.id_publicacion
+        LEFT JOIN reaccion r 
+            ON r.id_publicacion = p.id_publicacion
+        WHERE p.id_usuario = ?
+        GROUP BY p.id_publicacion
+        ORDER BY p.fecha_creacion DESC    
+    `, [id_usuario, id_usuario, id_usuario]);
+
+    return resultados;
+}
+
+
 // Actualizar publicacion
 const actualizar_publicacion = async (datos) => {
     const {titulo, descripcion, ingredientes, preparacion, archivo, public_id, tiempo_preparacion, tipo_tiempo, dificultad, id_publicacion} = datos;
@@ -161,6 +192,7 @@ module.exports = {
     crear_publicacion,
     listar_todas_publicaciones,
     listar_publicacion_id,
+    listar_publicaciones_usuario,
     actualizar_publicacion,
     eliminar_publicacion
 }

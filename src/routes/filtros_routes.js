@@ -13,7 +13,7 @@ const {filtrar_pupularidad,
 // Filtrar platos por poupularidad
 router.get('/populares', auth, filtrar_pupularidad);
 // Filtrar platos por antiguedad
-router.get('/antiguedad', auth, filtrar_antiguedad);
+router.get('/antiguas', auth, filtrar_antiguedad);
 // Filtrar platos por mas recientes
 router.get('/recientes', auth, filtrar_recientes);
 

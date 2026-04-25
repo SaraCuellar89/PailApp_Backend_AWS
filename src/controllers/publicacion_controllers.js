@@ -12,6 +12,7 @@ const {respuesta_exito,
 const {crear_publicacion,
     listar_todas_publicaciones,
     listar_publicacion_id,
+    listar_publicaciones_usuario,
     actualizar_publicacion,
     eliminar_publicacion} = require('../models/publicacion_model');
 
@@ -99,6 +100,21 @@ const obtener_publicacion_id = async (req, res) => {
 }
 
 
+// Obtener todas las publicaciones de un usuario
+const obtnener_publicaciones_usuario = async (req, res) => {
+    try{
+        const id_usuario = req.usuario.id_usuario; 
+
+        const resultados = await listar_publicaciones_usuario(id_usuario);
+
+        return respuesta_exito(res, 'Listado de publicaciones', 200, resultados);
+    }
+    catch(error){
+        return respuesta_error_servidor(res, error, 'No se pudo obtener todas las publicaciones');
+    }
+}
+
+
 // Editar una publicacion
 const editar_publicacion = async (req, res) => {
     try{
@@ -181,6 +197,7 @@ module.exports = {
     subir_publicacion,
     obtener_todas_publicaciones,
     obtener_publicacion_id,
+    obtnener_publicaciones_usuario,
     editar_publicacion,
     borrar_publicacion
 }
