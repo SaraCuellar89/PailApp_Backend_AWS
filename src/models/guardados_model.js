@@ -48,31 +48,36 @@ const eliminar_plato_guardado = async (datos) => {
 
 // Listar platos guardados
 const listar_platos_guardados = async (id_usuario) => {
-    const [total_platos_guardados] = await conexion.execute('SELECT COUNT(*) as total_guardados FROM publicacion_guardada WHERE id_usuario = ?', [id_usuario]);
-
     const [platos_guardados] = await conexion.execute(`
-        SELECT 
-        p.id_publicacion        AS publicacion_id,
-        p.titulo                AS publicacion_titulo,
-        p.descripcion           AS publicacion_descripcion,
-        p.ingredientes          AS publicacion_ingredientes,
-        p.archivo               AS publicacion_archivo,
-        p.fecha_creacion        AS publicacion_fecha,
-
-        u_post.id_usuario       AS autor_post_id,
-        u_post.nombre_usuario   AS autor_post_nombre,
-        u_post.avatar           AS autor_post_avatar
+        SELECT
+            p.*,
+            COUNT(DISTINCT c.id_comentario)  AS total_comentarios,
+            COUNT(DISTINCT r.id_usuario)     AS total_reacciones,
+            EXISTS (
+                SELECT 1 FROM reaccion r2 
+                WHERE r2.id_publicacion = p.id_publicacion 
+                AND r2.id_usuario = ?
+            ) AS usuario_ya_reacciono,
+            EXISTS (
+                SELECT 1 FROM publicacion_guardada pg 
+                WHERE pg.id_publicacion = p.id_publicacion 
+                AND pg.id_usuario = ?
+            ) AS usuario_ya_guardo
         FROM publicacion_guardada g
         INNER JOIN publicacion p
-        ON g.id_publicacion = p.id_publicacion
+            ON g.id_publicacion = p.id_publicacion
         INNER JOIN usuario u_post
-        ON p.id_usuario = u_post.id_usuario
-        WHERE g.id_usuario = ?    
-        GROUP BY p.fecha_creacion DESC
-    `, [id_usuario]);
+            ON p.id_usuario = u_post.id_usuario
+        LEFT JOIN comentario c 
+            ON c.id_publicacion = p.id_publicacion
+        LEFT JOIN reaccion r 
+            ON r.id_publicacion = p.id_publicacion
+        WHERE g.id_usuario = ?
+        GROUP BY p.id_publicacion
+        ORDER BY p.fecha_creacion DESC
+    `, [id_usuario, id_usuario, id_usuario]);
 
     const datos = {
-        total_platos_guardados,
         platos_guardados
     }
 
