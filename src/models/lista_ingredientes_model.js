@@ -4,9 +4,10 @@ const conexion = require('../config/databse');
 // Registrar ingredientes
 const insertar_ingredientes = async ({id_usuario, id_publicacion, ingredientes}) => {
 
-    for (const nombre of ingredientes)  {
+    for (const ing of ingredientes)  {
         await conexion.execute(
-            `INSERT INTO ingrediente_guardado (id_usuario, id_publicacion, nombre) VALUES (?, ?, ?)`, [id_usuario, id_publicacion, nombre]
+            `INSERT INTO ingrediente_guardado (id_usuario, id_publicacion, nombre, obtenido) VALUES (?, ?, ?, ?)`, 
+            [id_usuario, id_publicacion, ing.nombre, ing.obtenido]
         );
     }
 }
