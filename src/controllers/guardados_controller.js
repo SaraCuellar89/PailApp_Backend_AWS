@@ -55,7 +55,9 @@ const guardar_plato = async (req, res) => {
             ? JSON.parse(JSON.parse(ingredientes_raw))
             : JSON.parse(ingredientes_raw);
 
-        await insertar_ingredientes({id_usuario, id_publicacion, ingredientes});
+        const ingredientes_formateados = ingredientes.map(nombre => ({ nombre, obtenido: 0 }));
+
+        await insertar_ingredientes({id_usuario, id_publicacion, ingredientes: ingredientes_formateados});
 
         // Llamar al servicio de noticiacion
         await notificar({
