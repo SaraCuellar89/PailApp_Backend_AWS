@@ -53,12 +53,8 @@ const validar_editar_cuenta = (req, res, next) => {
     if (!regex_correo.test(correo))
         return respuesta_error(res, "Correo electrónico inválido", 400);
 
-    const { contrasena, edad, peso, altura } = req.body;
+    const { edad, peso, altura } = req.body;
 
-    if (contrasena && contrasena.length < 5)
-        return respuesta_error(res, "Contraseña inválida. Mínimo 5 caracteres", 400);
-
-    // Datos adicionales opcionales, pero si vienen se validan
     if (edad != null && (edad < 10 || edad > 120))
         return respuesta_error(res, "Edad fuera de rango válida (10-120)", 400);
 
@@ -71,8 +67,22 @@ const validar_editar_cuenta = (req, res, next) => {
     next();
 };
 
+const validar_editar_contrasena = (req, res, next) => {
+    const {contrasena_actual, contrasena_nueva, confirmacion_contrasena} = req.body;
+
+    if (!contrasena_actual || !contrasena_nueva || !confirmacion_contrasena)
+        return respuesta_error(res, "Todos los campos son obligatorios", 400);
+
+    if (contrasena_nueva && contrasena_nueva.length < 5)
+        return respuesta_error(res, "Contraseña inválida. Mínimo 5 caracteres", 400);
+
+    next();
+};
+
+
 module.exports = {
     validar_registro, 
     validar_datos_adicionales,
-    validar_editar_cuenta 
+    validar_editar_cuenta,
+    validar_editar_contrasena 
 };

@@ -77,13 +77,12 @@ const actualizar_usuario_contrasena = async (datos) => {
 }
 
 
-// Editar usuario
+// Actualizar datos del usuario
 const actualizar_usuario = async (datos) => {
-    const {id_usuario, nombre_usuario, correo, contrasena, avatar, altura, peso, edad, sexo} = datos;
+    const {id_usuario, nombre_usuario, correo, avatar, altura, peso, edad, sexo} = datos;
 
-    await conexion.execute('UPDATE usuario SET nombre_usuario = ?, correo = ?, contrasena = ?, avatar = ?, altura = ?, peso = ?, edad = ?, sexo = ? WHERE id_usuario = ?', [nombre_usuario, correo, contrasena, avatar, altura, peso, edad, sexo, id_usuario]);
+    await conexion.execute('UPDATE usuario SET nombre_usuario = ?, correo = ?, avatar = ?, altura = ?, peso = ?, edad = ?, sexo = ? WHERE id_usuario = ?', [nombre_usuario, correo, avatar, altura, peso, edad, sexo, id_usuario]);
 }
-
 
 
 // Eliminar usuario

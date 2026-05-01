@@ -217,7 +217,7 @@ const informacion_usuario_token = async(req, res) => {
 // Editar cuenta del usuario
 const editar_cuenta = async(req, res) => {
     try{
-        const {nombre_usuario, correo, contrasena, avatar, altura, peso, edad, sexo} = req.body;
+        const {nombre_usuario, correo, avatar, altura, peso, edad, sexo} = req.body;
         const id_usuario = req.usuario.id_usuario;
 
         const existencia = await obtener_usuario_id(id_usuario);
@@ -226,16 +226,53 @@ const editar_cuenta = async(req, res) => {
             return respuesta_error(res, 'Este usuario no existe', 400)
         }
 
-        const contrasena_encriptada = contrasena 
-            ? await encriptar_contrasena(contrasena)
-            : existencia[0].contrasena
-
-        await actualizar_usuario({id_usuario, nombre_usuario, correo, contrasena: contrasena_encriptada, avatar, altura, peso, edad, sexo});
+        await actualizar_usuario({id_usuario, nombre_usuario, correo, avatar, altura, peso, edad, sexo});
 
         return respuesta_exito(res, 'Cuenta editada correctamente', 200)
     }
     catch(error){
-        return respuesta_error_servidor(res, error, 'No se pudo editar la informacion de la cuenta')
+        return respuesta_error_servidor(res, error, 'No se pudo editar la informacion de la cuenta');
+    }
+}
+
+
+// Editar contraseña
+const editar_contrasena = async (req, res) => {
+    try {
+        const {contrasena_actual, contrasena_nueva, confirmacion_contrasena} = req.body;
+        const correo = req.usuario.correo;
+        const id_usuario = req.usuario.id_usuario;
+
+        if(contrasena_nueva !== confirmacion_contrasena){
+            return respuesta_error(res, 'Las contraseñas no coinciden', 400);
+        }
+
+        const busqueda = await buscar_usuario_correo(correo);
+
+        if(busqueda.length === 0){
+            return respuesta_error(res, 'La cuenta no esta registrada', 404);
+        }
+
+        const usuario = busqueda[0];
+
+        if (usuario.proveedor === "google"){
+            return respuesta_error(res, 'El correo no tiene contraseña', 400);
+        }
+
+        const contrasena_correcta = await comparar_contrasena(contrasena_actual, usuario.contrasena)
+
+        if(!contrasena_correcta){
+            return respuesta_error(res, 'Contrasena incorrecta', 401);
+        }
+
+        const contrasena_encriptada = await encriptar_contrasena(contrasena_nueva);
+
+        await actualizar_usuario_contrasena({id_usuario, contrasena: contrasena_encriptada});
+
+        return respuesta_exito(res, 'Contraseña editada correctamente', 200);
+
+    } catch (error) {
+        return respuesta_error_servidor(res, error, 'No se pudo verificar la contraseña');
     }
 }
 
@@ -331,6 +368,7 @@ module.exports = {
     iniciar_sesion_google,
     informacion_usuario_token,
     editar_cuenta,
+    editar_contrasena,
     eliminar_cuenta,
     solicitar_recuperacion,
     restablecer_contraseña,

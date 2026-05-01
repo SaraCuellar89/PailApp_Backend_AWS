@@ -4,7 +4,8 @@ const {auth} = require('../middlewares/index');
 const {limite_recuperacion, limite_inicio_sesion} = require('../middlewares/limites');
 const {validar_registro, 
     validar_datos_adicionales,
-    validar_editar_cuenta} = require('../validators/validaciones_usuario'); // Validaciones de campos
+    validar_editar_cuenta,
+    validar_editar_contrasena} = require('../validators/validaciones_usuario'); // Validaciones de campos
 
 
 // ================== Importacion de Controladores ==================
@@ -13,6 +14,7 @@ const {registrar_usuarios,
     iniciar_sesion_google,
     informacion_usuario_token, 
     editar_cuenta,
+    editar_contrasena,
     eliminar_cuenta,
     solicitar_recuperacion,
     restablecer_contraseña,
@@ -33,6 +35,8 @@ router.post('/iniciar_sesion_google', iniciar_sesion_google);
 router.get('/usuario_logueado', auth, informacion_usuario_token);
 // Editar la informacion de la cuenta
 router.put('/editar_cuenta', auth, validar_editar_cuenta, editar_cuenta);
+// Editar la contraseña de la cuenta
+router.put('/editar_contrasena', auth, validar_editar_contrasena, editar_contrasena);
 // Eliminar la cuenta
 router.delete('/eliminar_cuenta', auth, eliminar_cuenta);
 
