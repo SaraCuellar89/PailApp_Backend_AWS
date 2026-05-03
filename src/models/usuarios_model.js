@@ -29,7 +29,7 @@ const buscar_usuario_google = async (google_id) => {
 const crear_usuario_google = async (datos) => {
   const {nombre_usuario, correo, contrasena, avatar, google_id} = datos;
 
-  const avatar_db = "https://pbs.twimg.com/profile_images/1226219505208221696/fEEzgwG3_400x400.jpg";
+  const avatar_db = "https://raw.githubusercontent.com/SaraCuellar89/PailApp_Front/main/src/Img/avatar_1.png";
 
   await conexion.execute('INSERT INTO usuario (nombre_usuario, correo, contrasena, avatar, proveedor, google_id) VALUES(?, ?, ?, ?, "google", ?)', [nombre_usuario, correo, contrasena, avatar_db, google_id]);
 };
