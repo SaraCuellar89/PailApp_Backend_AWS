@@ -20,8 +20,8 @@ const obtener_token = async ({id_usuario}) => {
 
 
 // Eliminar token
-const borrar_token = async ({ id_usuario, token }) => {
-    const [resultado] = await conexion.execute('DELETE FROM dispositivo WHERE id_usuario = ? AND fcm_token = ?;', [id_usuario, token]);
+const borrar_token = async ({ id_usuario, fcm_token }) => {
+    const [resultado] = await conexion.execute('DELETE FROM dispositivo WHERE id_usuario = ? AND fcm_token = ?;', [id_usuario, fcm_token]);
 
     return resultado;
 }
