@@ -19,9 +19,17 @@ const obtener_token = async ({id_usuario}) => {
 }
 
 
+// Eliminar token
+const borrar_token = async ({ id_usuario, token }) => {
+    const [resultado] = await conexion.execute('DELETE FROM dispositivo WHERE id_usuario = ? AND fcm_token = ?;', [id_usuario, token]);
+
+    return resultado;
+}
+
 
 // ================== Exportar funciones ==================
 module.exports = {
     crear_token,
-    obtener_token
+    obtener_token,
+    borrar_token
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-04-2026 a las 23:00:12
+-- Tiempo de generación: 26-05-2026 a las 03:05:14
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -33,6 +33,21 @@ CREATE TABLE `comentario` (
   `fecha_creacion` datetime DEFAULT current_timestamp(),
   `id_usuario` int(5) NOT NULL,
   `id_publicacion` int(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `conversacion`
+--
+
+CREATE TABLE `conversacion` (
+  `id_conversacion` int(11) NOT NULL,
+  `id_usuario` int(5) NOT NULL,
+  `titulo` varchar(100) DEFAULT NULL,
+  `estado` enum('activa','archivada') DEFAULT 'activa',
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -148,7 +163,7 @@ CREATE TABLE `usuario` (
   `avatar` varchar(255) DEFAULT NULL,
   `proveedor` enum('local','google') DEFAULT 'local',
   `google_id` varchar(100) DEFAULT NULL,
-  `altura` decimal(3,2) DEFAULT NULL,
+  `altura` int(11) DEFAULT NULL,
   `peso` decimal(5,2) DEFAULT NULL,
   `edad` int(2) DEFAULT NULL,
   `sexo` enum('Masculino','Femenino','Prefiero no decirlo') DEFAULT NULL
@@ -179,6 +194,13 @@ ALTER TABLE `comentario`
   ADD PRIMARY KEY (`id_comentario`),
   ADD KEY `FKcomentario_usuario` (`id_usuario`),
   ADD KEY `FKcomentario_publicacion` (`id_publicacion`);
+
+--
+-- Indices de la tabla `conversacion`
+--
+ALTER TABLE `conversacion`
+  ADD PRIMARY KEY (`id_conversacion`),
+  ADD KEY `idx_conversacion_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `dispositivo`
@@ -257,6 +279,12 @@ ALTER TABLE `comentario`
   MODIFY `id_comentario` int(5) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `conversacion`
+--
+ALTER TABLE `conversacion`
+  MODIFY `id_conversacion` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `dispositivo`
 --
 ALTER TABLE `dispositivo`
@@ -308,6 +336,12 @@ ALTER TABLE `verificacion`
 ALTER TABLE `comentario`
   ADD CONSTRAINT `FKcomentario_publicacion` FOREIGN KEY (`id_publicacion`) REFERENCES `publicacion` (`id_publicacion`) ON DELETE CASCADE,
   ADD CONSTRAINT `FKcomentario_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `conversacion`
+--
+ALTER TABLE `conversacion`
+  ADD CONSTRAINT `fk_conversacion_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `dispositivo`

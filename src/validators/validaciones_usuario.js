@@ -35,8 +35,8 @@ const validar_datos_adicionales = (req, res, next) => {
     if (peso < 20 || peso > 300)
         return respuesta_error(res, "Peso fuera de rango válido (20-300 kg)", 400);
 
-    if (altura < 0.5 || altura > 2.5)
-        return respuesta_error(res, "Altura fuera de rango válida (0.50 - 2.50 m)", 400);
+    if (!Number.isInteger(Number(altura)) || altura < 130 || altura > 250)
+        return respuesta_error(res, "Altura fuera de rango válida (130 - 250 cm)", 400);
 
     next();
 };
@@ -61,8 +61,8 @@ const validar_editar_cuenta = (req, res, next) => {
     if (peso != null && (peso < 20 || peso > 300))
         return respuesta_error(res, "Peso fuera de rango válido (20-300 kg)", 400);
 
-    if (altura != null && (altura < 0.5 || altura > 2.5))
-        return respuesta_error(res, "Altura fuera de rango válida (0.50 - 2.50 m)", 400);
+    if (altura != null && (!Number.isInteger(Number(altura)) || altura < 130 || altura > 250))
+        return respuesta_error(res, "Altura fuera de rango válida (130 - 250 cm)", 400);
 
     next();
 };
